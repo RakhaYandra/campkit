@@ -1,49 +1,50 @@
-const pool = require('../config/database');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { User } = require('../models/user'); // Ensure that your User model is properly imported
 
+// Register a new user
 const register = async (req, res) => {
+  const { username, email, password, role } = req.body;
+
   try {
-    const { username, email, password, role } = req.body;
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const result = await pool.query(
-      'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, email, hashedPassword, role || 'user']
-    );
 
-    const token = jwt.sign(
-      { id: result.rows[0].id, role: result.rows[0].role },
-      'your_jwt_secret',
-      { expiresIn: '24h' }
-    );
+    // Create user in database
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      role, // 'admin' or 'user'
+    });
 
-    res.status(201).json({ user: result.rows[0], token });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(201).json({ message: 'User registered successfully', user });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to register user' });
   }
 };
 
+// Login user
 const login = async (req, res) => {
+  const { email, password } = req.body;
+
   try {
-    const { email, password } = req.body;
-    
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-    const user = result.rows[0];
+    const user = await User.findOne({ where: { email } });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      throw new Error('Invalid login credentials');
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Generate JWT token
     const token = jwt.sign(
       { id: user.id, role: user.role },
-      'your_jwt_secret',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
     );
 
-    res.json({ user, token });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.json({ token, role: user.role });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to login' });
   }
 };
 
