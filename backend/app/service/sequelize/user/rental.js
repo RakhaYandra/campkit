@@ -27,7 +27,7 @@ const getUserRentals = async (req) => {
 
 const createRental = async (req) => {
     const userId = req.user?.user?.id;
-    const { units, rentalDosate } = req.body;
+    const { units, rentalDate } = req.body;
 
     if (!userId) {
         throw new BadRequestError("User ID is required");

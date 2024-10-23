@@ -1,57 +1,38 @@
-// src/App.jsx
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "./context/AuthContext";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext"; // Corrected path
 import Layout from "./components/Layout";
-import Products from "./pages/Products";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
-import Borrowings from "./pages/Borrowings";
-import RequireAuth from "./components/RequireAuth";
-import { Toaster } from "./components/ui/toaster";
+import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
+import RentalHistory from "./pages/RentalHistory";
+import RentalBooking from "./pages/RentalBooking";
+import RentalDetail from "./pages/RentalDetail";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-
-            {/* Protected Routes */}
-            <Route
-              path="/"
-              element={
-                <RequireAuth>
-                  <Layout />
-                </RequireAuth>
-              }
-            >
-              <Route index element={<Products />} />
-              <Route path="products" element={<Products />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="borrowings" element={<Borrowings />} />
-              <Route path="profile" element={<Profile />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/rentals" element={<RentalHistory />} />
+              <Route path="/rental/book" element={<RentalBooking />} />
+              <Route path="/rental/:id" element={<RentalDetail />} />
             </Route>
-          </Routes>
-          <Toaster />
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

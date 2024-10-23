@@ -1,54 +1,51 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { login as loginApi } from '../services/api';
+import { createContext, useContext, useState } from "react";
+import axios from "axios";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
+
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await loginApi(email, password);
-      const { user, token } = response;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      return response;
+      const response = await axios.post(
+        "http://localhost:9000/api/user/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+      setUser(response.data);
+      return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      throw error;
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:9000/api/user/auth/register",
+        userData
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const value = {
+    user,
+    login,
+    register,
+    logout,
+  };
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
