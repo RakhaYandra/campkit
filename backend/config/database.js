@@ -1,10 +1,10 @@
-const { Pool } = require('pg'); // or any other database client
+const { Pool } = require('pg'); 
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'campkit',
   password: '12345678',
-  port: 5432, // default port for PostgreSQL
+  port: 5432, 
 });
 
 module.exports = {

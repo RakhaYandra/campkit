@@ -5,13 +5,13 @@ const db = require('../config/database'); // Adjust the path as necessary
 const router = express.Router();
 
 router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body; // Include role in the request body
   try {
     // Hash password and save user logic...
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await db.query(
       'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
-      [username, email, hashedPassword, 'user']
+      [username, email, hashedPassword, role || 'user']
     );
     const token = jwt.sign(
       { id: newUser.rows[0].id, role: newUser.rows[0].role },

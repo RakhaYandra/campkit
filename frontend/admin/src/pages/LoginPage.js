@@ -14,17 +14,20 @@ const LoginPage = () => {
       const response = await axios.post('http://localhost:3000/auth/login', { email, password });
       const { token, user } = response.data;
 
+      // Check if the user role is admin
+      if (user.role !== 'admin') {
+        setError('Only admins can log in.');
+        return;
+      }
+
       // Save token and user data in localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect based on user role
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
+      // Redirect to admin dashboard
+      navigate('/admin/dashboard');
     } catch (err) {
+      console.error(err.response.data); // Log the error response
       setError('Invalid login credentials');
     }
   };

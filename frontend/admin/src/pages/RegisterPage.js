@@ -12,19 +12,20 @@ const RegisterPage = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/auth/register', { username, email, password });
+      const response = await axios.post('http://localhost:3000/auth/register', { 
+        username, 
+        email, 
+        password, 
+        role: 'admin' // Set role as admin
+      });
       const { token, user } = response.data;
 
       // Save token and user data in localStorage
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect based on user role
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
+      // Redirect to admin dashboard
+      navigate('/admin/dashboard');
     } catch (err) {
       setError('Registration failed. Try again.');
     }
