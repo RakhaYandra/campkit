@@ -1,41 +1,40 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext(null);
+export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-  const login = async (email, password) => {
-    try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await response.json();
-      if (response.ok) {
-        setUser(data.user);
-        localStorage.setItem('token', data.token);
-        return data.user.role;
-      } else {
-        throw new Error(data.error);
-      }
-    } catch (error) {
-      throw error;
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+      setUser({ token });
     }
+  }, []);
+
+  const login = (token) => {
+    localStorage.setItem('token', token);
+    setIsAuthenticated(true);
+    setUser({ token });
+    navigate('/');
   };
 
   const logout = () => {
-    setUser(null);
     localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    setUser(null);
+    navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export default AuthProvider;

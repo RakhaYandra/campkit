@@ -3,6 +3,9 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/database'); // Adjust the path as necessary
 const router = express.Router();
+const { authMiddleware, getProfile } = require('../controllers/authController'); // Ensure correct import
+
+
 
 router.post('/register', async (req, res) => {
   const { username, email, password, role } = req.body; // Include role in the request body
@@ -49,5 +52,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+router.get('/profile', authMiddleware, getProfile);
 
 module.exports = router;

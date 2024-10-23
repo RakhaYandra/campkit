@@ -1,19 +1,41 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import Dashboard from './pages/Dashboard';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Borrowings from './pages/Borrowings';
+import Profile from './pages/Profile';
+import PrivateRoute from './router/PrivateRoute';
 
 function App() {
   return (
-    <Router>
+    <div>
+      <Navbar />
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/user/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Protected Routes */}
+        <Route
+          path="/borrowings"
+          element={
+            <PrivateRoute>
+              <Borrowings />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
       </Routes>
-    </Router>
+    </div>
   );
 }
 
