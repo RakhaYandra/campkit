@@ -1,14 +1,13 @@
+// backend/routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
-const { authMiddleware, isAdmin } = require('../middleware/auth');
-const productController = require('../controllers/productController');
+const { authenticateToken } = require('../middleware/auth');
+const {
+  getProducts,
+  getProductById,
+} = require('../controllers/productController');
 
-// User routes
-router.get('/', productController.getAllProducts);
-
-// Admin routes
-router.post('/', authMiddleware, isAdmin, productController.createProduct);
-router.put('/:id', authMiddleware, isAdmin, productController.updateProduct);
-router.delete('/:id', authMiddleware, isAdmin, productController.deleteProduct);
+router.get('/', getProducts);
+router.get('/:id', getProductById);
 
 module.exports = router;

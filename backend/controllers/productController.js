@@ -1,41 +1,34 @@
-const Product = require('../models/product');
+const Product = require('../models/Product');
 
-exports.getAllProducts = async (req, res) => {
+const createProduct = async (req, res) => {
   try {
-    const products = await Product.getAll();
-    res.status(200).json(products);
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching products', error });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.createProduct = async (req, res) => {
-  const { name, description, stock_quantity, available_quantity, price_per_day, condition_status } = req.body;
+const getProducts = async (req, res) => {
   try {
-    const newProduct = await Product.create(name, description, stock_quantity, available_quantity, price_per_day, condition_status);
-    res.status(201).json(newProduct);
+    const filters = {
+      category_id: req.query.category_id,
+      search: req.query.search
+    };
+    const products = await Product.findAll(filters);
+    res.json(products);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating product', error });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const productData = req.body;
+const updateProduct = async (req, res) => {
   try {
-    const updatedProduct = await Product.update(id, productData);
-    res.status(200).json(updatedProduct);
+    const product = await Product.update(req.params.id, req.body);
+    res.json(product);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating product', error });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.deleteProduct = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const deletedProduct = await Product.delete(id);
-    res.status(200).json(deletedProduct);
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting product', error });
-  }
-};
+module.exports = { createProduct, getProducts, updateProduct };

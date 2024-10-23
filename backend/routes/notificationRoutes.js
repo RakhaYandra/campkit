@@ -1,9 +1,12 @@
+// routes/notificationRoutes.js
 const express = require('express');
 const router = express.Router();
-const { authMiddleware } = require('../middleware/auth');
+const { authenticateToken } = require('../middleware/auth');
 const notificationController = require('../controllers/notificationController');
 
-// User routes
-router.get('/', authMiddleware, notificationController.getUserNotifications);
+// Pastikan handler ada sebelum digunakan di routes
+router.get('/', authenticateToken, notificationController.getNotifications);
+router.get('/unread-count', authenticateToken, notificationController.getUnreadCount);
+router.put('/:id/read', authenticateToken, notificationController.markAsRead);
 
 module.exports = router;
