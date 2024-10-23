@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Borrowings from "./pages/Borrowings";
 import RequireAuth from "./components/RequireAuth";
 import { Toaster } from "./components/ui/toaster";
+import ProductDetail from "./pages/ProductDetail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,7 @@ function App() {
             >
               <Route index element={<Products />} />
               <Route path="products" element={<Products />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="borrowings" element={<Borrowings />} />
               <Route path="profile" element={<Profile />} />
             </Route>

@@ -28,16 +28,17 @@ export default function Layout() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex">
+            <div className="flex items-center ml-[-156px]">
+              {" "}
               <Link to="/" className="text-xl font-bold text-gray-900">
                 CampKit
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 ml-auto pr-4">
+              {" "}
               <button type="button" className="relative">
                 <Bell className="h-6 w-6 text-gray-400 hover:text-gray-500" />
               </button>
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center space-x-2 focus:outline-none">
@@ -50,7 +51,7 @@ export default function Layout() {
                     <ChevronDown className="h-4 w-4 text-gray-500" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-48 right-0">
                   <DropdownMenuItem
                     onClick={() => navigate("/profile")}
                     className="cursor-pointer"

@@ -1,29 +1,61 @@
-import { useQuery } from '@tanstack/react-query';
-import { getUserBorrowings } from '../../services/api';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { format } from 'date-fns';
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+
+const dummyBorrowings = [
+  {
+    id: 1,
+    booking_code: "ABC123",
+    status: "confirmed",
+    items: [
+      { product_name: "Tent", quantity: 2, subtotal: 40 },
+      { product_name: "Sleeping Bag", quantity: 1, subtotal: 10 },
+    ],
+    borrow_date: "2023-10-01",
+    return_date: "2023-10-05",
+    total_price: 50,
+    admin_notes: "Handle with care",
+  },
+  {
+    id: 2,
+    booking_code: "XYZ789",
+    status: "returned",
+    items: [{ product_name: "Camping Stove", quantity: 1, subtotal: 15 }],
+    borrow_date: "2023-09-15",
+    return_date: "2023-09-20",
+    total_price: 15,
+    admin_notes: "",
+  },
+  // Add more dummy borrowings as needed
+];
 
 export default function Borrowings() {
-  const { data: borrowings = [], isLoading } = useQuery({
-    queryKey: ['borrowings'],
-    queryFn: getUserBorrowings
-  });
+  const [borrowings, setBorrowings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate API call
+    setTimeout(() => {
+      setBorrowings(dummyBorrowings);
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
   const getStatusColor = (status) => {
     const statusColors = {
-      'pending': 'bg-yellow-100 text-yellow-800',
-      'confirmed': 'bg-blue-100 text-blue-800',
-      'active': 'bg-green-100 text-green-800',
-      'returned': 'bg-gray-100 text-gray-800',
-      'cancelled': 'bg-red-100 text-red-800'
+      pending: "bg-yellow-100 text-yellow-800",
+      confirmed: "bg-blue-100 text-blue-800",
+      active: "bg-green-100 text-green-800",
+      returned: "bg-gray-100 text-gray-800",
+      cancelled: "bg-red-100 text-red-800",
     };
-    return statusColors[status] || 'bg-gray-100 text-gray-800';
+    return statusColors[status] || "bg-gray-100 text-gray-800";
   };
 
   const formatDate = (dateString) => {
     try {
-      return format(new Date(dateString), 'dd MMM yyyy');
+      return format(new Date(dateString), "dd MMM yyyy");
     } catch {
       return dateString;
     }
@@ -69,8 +101,13 @@ export default function Borrowings() {
                     <p className="text-sm text-gray-500 mb-2">Items</p>
                     <div className="space-y-2">
                       {borrowing.items?.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center text-sm">
-                          <span>{item.product_name} x{item.quantity}</span>
+                        <div
+                          key={index}
+                          className="flex justify-between items-center text-sm"
+                        >
+                          <span>
+                            {item.product_name} x{item.quantity}
+                          </span>
                           <span>${item.subtotal}</span>
                         </div>
                       ))}
@@ -89,7 +126,9 @@ export default function Borrowings() {
                       </div>
                       <div>
                         <p className="text-gray-500">Total Price</p>
-                        <p className="font-semibold">${borrowing.total_price}</p>
+                        <p className="font-semibold">
+                          ${borrowing.total_price}
+                        </p>
                       </div>
                     </div>
                   </div>

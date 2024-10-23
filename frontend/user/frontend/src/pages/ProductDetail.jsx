@@ -1,64 +1,53 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useParams, useNavigate } from 'react-router-dom';
-import { getProductById, createBorrowing } from '../services/api';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { useState } from 'react';
-import { useToast } from '@/components/ui/use-toast';
+// src/pages/ProductDetail.jsx
+import { useParams, useNavigate } from "react-router-dom";
+import { Card, CardContent, CardFooter } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { useState } from "react";
+
+const dummyProduct = {
+  id: 1,
+  name: "Tent",
+  description: "A spacious 4-person tent.",
+  price_per_day: 20,
+  available_quantity: 5,
+  image_urls: ["/images/tent.jpg"],
+};
 
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
   const [dates, setDates] = useState({
-    borrow_date: '',
-    return_date: ''
+    borrow_date: "",
+    return_date: "",
   });
 
-  const { data: product, isLoading } = useQuery({
-    queryKey: ['product', id],
-    queryFn: () => getProductById(id)
-  });
-
-  const borrowMutation = useMutation({
-    mutationFn: createBorrowing,
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Borrowing request created successfully"
-      });
-      navigate('/borrowings');
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message
-      });
-    }
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!product) return <div>Product not found</div>;
+  const product = dummyProduct; // Use dummy data
 
   const handleBorrow = () => {
     const days = Math.ceil(
-      (new Date(dates.return_date) - new Date(dates.borrow_date)) / (1000 * 60 * 60 * 24)
+      (new Date(dates.return_date) - new Date(dates.borrow_date)) /
+        (1000 * 60 * 60 * 24)
     );
 
-    borrowMutation.mutate({
-      items: [{
-        product_id: product.id,
-        quantity: parseInt(quantity),
-        price_per_day: product.price_per_day,
-        subtotal: product.price_per_day * days * quantity
-      }],
+    // Dummy borrow action
+    console.log({
+      items: [
+        {
+          product_id: product.id,
+          quantity: parseInt(quantity),
+          price_per_day: product.price_per_day,
+          subtotal: product.price_per_day * days * quantity,
+        },
+      ],
       borrow_date: dates.borrow_date,
       return_date: dates.return_date,
-      total_price: product.price_per_day * days * quantity
+      total_price: product.price_per_day * days * quantity,
     });
+
+    // Navigate to borrowings page
+    navigate("/borrowings");
   };
 
   return (
@@ -75,8 +64,10 @@ export default function ProductDetail() {
             <Input
               type="date"
               value={dates.borrow_date}
-              onChange={(e) => setDates({ ...dates, borrow_date: e.target.value })}
-              min={new Date().toISOString().split('T')[0]}
+              onChange={(e) =>
+                setDates({ ...dates, borrow_date: e.target.value })
+              }
+              min={new Date().toISOString().split("T")[0]}
             />
           </div>
           <div>
@@ -84,7 +75,9 @@ export default function ProductDetail() {
             <Input
               type="date"
               value={dates.return_date}
-              onChange={(e) => setDates({ ...dates, return_date: e.target.value })}
+              onChange={(e) =>
+                setDates({ ...dates, return_date: e.target.value })
+              }
               min={dates.borrow_date}
             />
           </div>
@@ -113,9 +106,9 @@ export default function ProductDetail() {
         <Button
           className="w-full"
           onClick={handleBorrow}
-          disabled={!dates.borrow_date || !dates.return_date || borrowMutation.isPending}
+          disabled={!dates.borrow_date || !dates.return_date}
         >
-          {borrowMutation.isPending ? 'Processing...' : 'Confirm Borrowing'}
+          Confirm Borrowing
         </Button>
       </CardFooter>
     </Card>

@@ -1,1 +1,5 @@
-/node_modules
+node_modules
+deployment/development/.env
+deployment/development/ca.pem
+deployment/staging/.env
+deployment/production/.env

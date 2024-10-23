@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3cd000/api'  // Sesuaikan dengan port backend Anda
+  baseURL: 'http://localhost:3000/api'  // Sesuaikan dengan port backend Anda
 });
 
 // Request interceptor
