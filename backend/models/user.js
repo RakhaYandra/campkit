@@ -1,38 +1,20 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/database');
+const pool = require('../config/database');
 
-const User = sequelize.define('User', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'user',
-  },
-  created_at: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  }
-}, {
-  tableName: 'users',
-  timestamps: false, // Since you are handling timestamps in your table directly
-});
+const User = {
+    findByEmail: async (email) => {
+        const query = 'SELECT * FROM users WHERE email = $1';
+        const result = await pool.query(query, [email]);
+        return result.rows[0];
+    },
+    createUser: async (username, email, hashedPassword, role) => {
+        const query = `
+            INSERT INTO users (username, email, password, role) 
+            VALUES ($1, $2, $3, $4) 
+            RETURNING id, username, email, role;
+        `;
+        const result = await pool.query(query, [username, email, hashedPassword, role]);
+        return result.rows[0];
+    },
+};
 
 module.exports = User;

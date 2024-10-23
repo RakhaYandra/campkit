@@ -1,27 +1,15 @@
 const express = require('express');
-const { connectDB } = require('./config/database');
-const authRoutes = require('./routes/authRoutes'); // Example of auth routes
-
-require('dotenv').config(); // To use environment variables
+const cors = require('cors');
+const authRoutes = require('./routes/authRoutes');
+require('dotenv').config();
 
 const app = express();
-
-// Middleware to parse JSON requests
+app.use(cors());
 app.use(express.json());
 
-// Connect to the database
-connectDB();
+app.use('/auth', authRoutes);
 
-// Define your routes (example: authentication routes)
-app.use('/api/auth', authRoutes);
-
-// Handle other routes (404)
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Resource not found' });
-});
-
-// Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
