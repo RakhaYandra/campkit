@@ -1,49 +1,44 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:3000/auth/login', { email, password });
-      const { user } = response.data;
+      const { token, user } = response.data;
 
-      // Redirect based on role
+      // Save token and user data in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      // Redirect based on user role
       if (user.role === 'admin') {
-        navigate('/admin/home');
+        navigate('/admin/dashboard');
       } else {
-        navigate('/user/home');
+        navigate('/user/dashboard');
       }
-    } catch (error) {
-      console.error('Login failed', error);
+    } catch (err) {
+      setError('Invalid login credentials');
     }
   };
 
   return (
     <div>
       <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          placeholder="Email" 
-          required 
-        />
-        <input 
-          type="password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          placeholder="Password" 
-          required 
-        />
+      <form onSubmit={handleLogin}>
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">Login</button>
       </form>
+      {error && <p>{error}</p>}
+      <p>Don't have an account? <a href="/register">Register here</a></p>
     </div>
   );
 };
