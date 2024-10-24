@@ -64,192 +64,179 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create a new account
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Or{" "}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
-          >
-            sign in to your account
-          </Link>
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          {error && (
-            <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <div className="mt-1">
+    <section className="bg-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        <a
+          href="#"
+          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
+        >
+          <img
+            className="w-8 h-8 mr-2"
+            src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
+            alt="logo"
+          />
+          Campkit
+        </a>
+        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+              Create a new account
+            </h1>
+            {error && (
+              <div className="mb-4 bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Your email
+                </label>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
-                  autoComplete="email"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="email"
+                  id="email"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="name@company.com"
+                  required
                   value={formData.email}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="fullName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Full Name
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="fullName"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Full Name
+                </label>
                 <input
-                  id="fullName"
-                  name="fullName"
                   type="text"
-                  autoComplete="name"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="fullName"
+                  id="fullName"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="John Doe"
+                  required
                   value={formData.fullName}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="phoneNumber"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Phone Number
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="phoneNumber"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Phone Number
+                </label>
                 <input
-                  id="phoneNumber"
-                  name="phoneNumber"
                   type="text"
-                  autoComplete="tel"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="phoneNumber"
+                  id="phoneNumber"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="123-456-7890"
+                  required
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Address
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="address"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Address
+                </label>
                 <input
-                  id="address"
-                  name="address"
                   type="text"
-                  autoComplete="street-address"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="address"
+                  id="address"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="123 Main St"
+                  required
                   value={formData.address}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Password
+                </label>
                 <input
-                  id="password"
-                  name="password"
                   type="password"
-                  autoComplete="new-password"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="password"
+                  id="password"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="••••••••"
+                  required
                   value={formData.password}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </label>
-              <div className="mt-1">
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                >
+                  Confirm Password
+                </label>
                 <input
-                  id="confirmPassword"
-                  name="confirmPassword"
                   type="password"
-                  autoComplete="new-password"
-                  required
-                  className={`appearance-none block w-full px-3 py-2 border ${
+                  name="confirmPassword"
+                  id="confirmPassword"
+                  className={`bg-gray-50 border ${
                     error ? "border-red-300" : "border-gray-300"
-                  } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                  } text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                  placeholder="••••••••"
+                  required
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   disabled={isSubmitting}
                 />
               </div>
-            </div>
-
-            <div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                  isSubmitting
-                    ? "bg-blue-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                className={`w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ${
+                  isSubmitting ? "cursor-not-allowed" : ""
+                }`}
               >
                 {isSubmitting ? "Registering..." : "Register"}
               </button>
-            </div>
-          </form>
+              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                Don’t have an account yet?{" "}
+                <Link
+                  to="/login"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -1,5 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
+import { Navigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -18,6 +20,7 @@ export const AuthProvider = ({ children }) => {
         }
       );
       setUser(response.data);
+      Cookies.set("jwtToken", response.data.data.token);
       return response.data;
     } catch (error) {
       throw error;

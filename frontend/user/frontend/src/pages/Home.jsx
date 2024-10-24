@@ -1,47 +1,68 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getCategories } from '../services/api';
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { getUnits } from "../services/api"; // Make sure this function calls the API at {{base_url}}/api/units
 
 const Home = () => {
-  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [searchParams] = useSearchParams();
+  const categoryId = searchParams.get("category"); // Get categoryId from query string
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
-        const response = await getCategories();
-        console.log('Fetched categories:', response); // Log the entire response
-        // Extract the data array from the response
+        const response = await getUnits(); // Fetch products (units) from backend
         if (response && response.data && Array.isArray(response.data.data)) {
-          setCategories(response.data.data); // response.data.data contains the categories array
+          // Filter products based on categoryId, if provided
+          const filteredProducts = categoryId
+            ? response.data.data.filter((product) =>
+                product.Categories.some(
+                  (category) => category.name === categoryId
+                )
+              )
+            : response.data.data;
+
+          setProducts(filteredProducts);
         } else {
-          console.error('Expected an array but got:', response.data);
+          console.error("Expected an array but got:", response.data);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        console.error("Error fetching products:", error);
       }
     };
-    fetchCategories();
-  }, []);
+
+    fetchProducts();
+  }, [categoryId]); // Re-run effect when categoryId changes
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Welcome to Rental App</h1>
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Categories</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Array.isArray(categories) &&
-            categories.map((category) => (
-              <Link
-                key={category.id}
-                to={`/products?category=${category.id}`}
-                className="p-4 border rounded-lg hover:shadow-lg transition-shadow"
-              >
-                <h3 className="text-xl font-medium">{category.name}</h3>
-                <p className="text-gray-600">{category.description}</p>
-              </Link>
-            ))}
+      {/* Hero Section */}
+
+      {/* Additional Section */}
+      <section className="bg-white dark:bg-gray-900 py-16">
+        <div className="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:grid-cols-12">
+          <div className="mr-auto place-self-center lg:col-span-7">
+            <h1 className="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl dark:text-white">
+              Your outdoor escape starts here{" "}
+            </h1>
+            <p className="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl dark:text-gray-400">
+              Explore the great outdoors with our premium camping gear! Rent
+              everything you need for your next adventure
+            </p>
+            <a
+              href="products"
+              className="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white bg-blue-700 border border-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:text-white dark:border-blue-700 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              View our products
+            </a>
+          </div>
+          <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
+            <img
+              src="https://antarestar.com/wp-content/uploads/2021/01/Tenda-Camping-200-x-200-1.png"
+              alt="mockup"
+            />
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

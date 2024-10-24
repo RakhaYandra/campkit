@@ -46,9 +46,9 @@ const updateUser = async (req) => {
     }
 
     // Validate base64 image
-    if (image && !validator.isBase64(image)) {
-        throw new BadRequestError("Invalid base64 image");
-    }
+    // if (image && !validator.isBase64(image)) {
+    //     throw new BadRequestError("Invalid base64 image");
+    // }
 
     // Update user fields
     user.fullName = fullName;

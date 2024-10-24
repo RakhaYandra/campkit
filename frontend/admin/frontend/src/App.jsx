@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import CreateCategory from "./pages/categories/CreateCategory";
 import EditCategory from "./pages/categories/EditCategory";
@@ -13,20 +14,18 @@ import { AuthProvider } from "./context/AuthContext";
 const App = () => {
   return (
     <AuthProvider>
-      <Router>
-        <Layout>
-          <Routes>
-            <Route path="/categories/create" element={<CreateCategory />} />
-            <Route path="/categories/edit/:id" element={<EditCategory />} />
-            <Route path="/units" element={<Units />} />
-            <Route path="/units/create" element={<CreateUnit />} />
-            <Route path="/units/edit/:id" element={<EditUnit />} />
-            <Route path="/rentals" element={<Rentals />} />
-            <Route path="/rentals/:id" element={<RentalDetail />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-          </Routes>
-        </Layout>
-      </Router>
+      <Layout>
+        <Routes>
+          <Route path="/categories/create" element={<CreateCategory />} />
+          <Route path="/categories/edit/:id" element={<EditCategory />} />
+          <Route path="/units" element={<Units />} />
+          <Route path="/units/create" element={<CreateUnit />} />
+          <Route path="/units/edit/:id" element={<EditUnit />} />
+          <Route path="/rentals" element={<Rentals />} />
+          <Route path="/rentals/:id" element={<RentalDetail />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </Layout>
     </AuthProvider>
   );
 };

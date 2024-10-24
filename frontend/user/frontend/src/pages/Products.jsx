@@ -1,25 +1,101 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { getUnits } from "../services/api"; // Make sure this function calls the API at {{base_url}}/api/units
+import { Link } from "react-router-dom";
+import { getUnits } from "../services/api"; // Removed bookRental import
+import Cookies from "js-cookie";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [searchParams] = useSearchParams();
-  const categoryId = searchParams.get("category"); // Get categoryId from query string
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [rentalDate, setRentalDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+
+  // Search handler
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Sorting toggle
+  const handleSortToggle = () => {
+    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
+  };
+
+  // Product selection handler
+  const handleProductSelect = (product) => {
+    setSelectedProducts((prevSelected) => {
+      if (prevSelected.some((p) => p.id === product.id)) {
+        return prevSelected.filter((p) => p.id !== product.id);
+      } else if (prevSelected.length < 2) {
+        return [...prevSelected, product];
+      } else {
+        alert("You can only select up to 2 products.");
+        return prevSelected;
+      }
+    });
+  };
+
+  // Booking handler
+  const handleBooking = async () => {
+    if (!rentalDate || !returnDate) {
+      alert("Please select rental and return dates.");
+      return;
+    }
+
+    const token = Cookies.get("jwtToken"); // Replace with actual token
+
+    try {
+      const response = await fetch("http://localhost:9000/api/user/rental", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          units: selectedProducts.map((product) => product.id),
+          rentalDate,
+          returnDate,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const responseData = await response.json();
+      console.log("Booking successful:", responseData);
+      setSelectedProducts([]); // Clear selected products after booking
+      setRentalDate(""); // Clear rental date
+      setReturnDate(""); // Clear return date
+    } catch (error) {
+      console.error("Error booking products:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await getUnits(); // Fetch products (units) from backend
+        const response = await getUnits();
         if (response && response.data && Array.isArray(response.data.data)) {
-          // Filter products based on categoryId, if provided
-          const filteredProducts = categoryId
-            ? response.data.data.filter((product) =>
-                product.Categories.some((category) => category.name === categoryId)
-              )
-            : response.data.data;
+          let fetchedProducts = response.data.data;
 
-          setProducts(filteredProducts);
+          // Apply search filtering
+          if (searchQuery) {
+            fetchedProducts = fetchedProducts.filter((product) =>
+              product.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+          }
+
+          // Sort products by name or price
+          fetchedProducts.sort((a, b) => {
+            if (sortOrder === "asc") {
+              return a.name.localeCompare(b.name);
+            } else {
+              return b.name.localeCompare(a.name);
+            }
+          });
+
+          setProducts(fetchedProducts);
         } else {
           console.error("Expected an array but got:", response.data);
         }
@@ -29,36 +105,144 @@ const Products = () => {
     };
 
     fetchProducts();
-  }, [categoryId]); // Re-run effect when categoryId changes
+  }, [searchQuery, sortOrder]);
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">Available Products</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Search and Sort Section */}
+      <div className="flex items-center space-x-4 mb-6">
+        {/* Search Input */}
+        <input
+          type="text"
+          placeholder="Search..."
+          className="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:focus:ring-gray-700"
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+
+        {/* Sort Button */}
+        <button
+          type="button"
+          onClick={handleSortToggle}
+          className="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+        >
+          Sort {sortOrder === "asc" ? "Ascending" : "Descending"}
+        </button>
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
         {Array.isArray(products) && products.length > 0 ? (
           products.map((product) => (
-            <Link
+            <div
               key={product.id}
-              to={`/products/${product.id}`}
-              className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+              className={`rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 ${
+                selectedProducts.some((p) => p.id === product.id)
+                  ? "border-blue-500"
+                  : ""
+              }`}
+              onClick={() => handleProductSelect(product)}
             >
-              <img
-                src={`/images/${product.image}`} // Assuming you serve images from the /images directory
-                alt={product.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-                <p className="text-gray-600 mb-2">${product.price}/day</p>
-                <p className="text-gray-500">
-                  {product.isAvailable ? "Available" : "Not Available"}
-                </p>
+              <div className="h-56 w-full">
+                <img
+                  className="mx-auto h-full"
+                  src={`/images/${product.image}`}
+                  alt={product.name}
+                />
               </div>
-            </Link>
+              <div className="pt-6">
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <span className="me-2 rounded bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                    {product.discount
+                      ? `Up to ${product.discount}% off`
+                      : "No Discount"}
+                  </span>
+                </div>
+
+                <div className="text-lg font-semibold leading-tight text-gray-900 dark:text-white">
+                  {product.name}
+                </div>
+
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    ${product.price}/day
+                  </span>
+                  <span className="text-gray-500">
+                    {product.isAvailable ? "Available" : "Not Available"}
+                  </span>
+                </div>
+              </div>
+            </div>
           ))
         ) : (
-          <p>No products available for this category.</p>
+          <p>No products available.</p>
         )}
+      </div>
+
+      {/* Selected Products List */}
+      <div className="mt-6">
+        <h2 className="text-2xl font-bold mb-4">Selected Products</h2>
+        {selectedProducts.length > 0 ? (
+          <ul className="space-y-4">
+            {selectedProducts.map((product) => (
+              <li
+                key={product.id}
+                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-white dark:border-gray-700 dark:bg-gray-800"
+              >
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    ${product.price}/day
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleProductSelect(product)}
+                  className="text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No products selected.</p>
+        )}
+      </div>
+
+      {/* Rental and Return Date Inputs */}
+      <div className="mt-6">
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Rental Date
+        </label>
+        <input
+          type="date"
+          className="block w-full p-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+          value={rentalDate}
+          onChange={(e) => setRentalDate(e.target.value)}
+        />
+      </div>
+      <div className="mt-6">
+        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Return Date
+        </label>
+        <input
+          type="date"
+          className="block w-full p-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+          value={returnDate}
+          onChange={(e) => setReturnDate(e.target.value)}
+        />
+      </div>
+
+      {/* Booking Button */}
+      <div className="mt-6">
+        <button
+          onClick={handleBooking}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Book Now
+        </button>
       </div>
     </div>
   );
