@@ -13,6 +13,6 @@
       "skipLibCheck": true,
       "esModuleInterop": true
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "../../admin/frontend/src/pages/auth", "../../admin/frontend/src/pages/profile", "../../admin/frontend/src/pages/categories", "../../admin/frontend/src/pages/rentals", "../../admin/frontend/src/pages/units", "../../admin/frontend/src/pages/Dashboard.jsx"],
     "exclude": ["node_modules", "dist"]
   }

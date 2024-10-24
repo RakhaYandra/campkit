@@ -21,7 +21,7 @@ const create = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json({
             status: StatusCodes.OK,
-            msg: "Profile Super Admin updated successfully",
+            msg: "Rental Successly Created",
             data: result,
         });
     } catch (err) {
