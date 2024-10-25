@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -19,20 +19,9 @@ export const AuthProvider = ({ children }) => {
           password,
         }
       );
-      setUser(response.data);
-      Cookies.set("jwtToken", response.data.data.token);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const register = async (userData) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:9000/api/user/auth/register",
-        userData
-      );
+      setUser(response.data.data);
+      console.log("User Logged In:", response.data.data.token);
+    localStorage.setItem("jwtToken", response.data.data.token);
       return response.data;
     } catch (error) {
       throw error;
@@ -41,12 +30,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    Cookies.remove("jwtToken");
+    window.location.href = "/login";
   };
 
   const value = {
     user,
     login,
-    register,
     logout,
   };
 

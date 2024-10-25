@@ -27,7 +27,7 @@ const getUserRentals = async (req) => {
 
 const createRental = async (req) => {
     const userId = req.user?.user?.id;
-    const { units, rentalDate } = req.body;
+    const { units, rentalDate, maxReturnDate } = req.body;
 
     if (!userId) {
         throw new BadRequestError("User ID is required");
@@ -39,6 +39,10 @@ const createRental = async (req) => {
 
     if (!rentalDate) {
         throw new BadRequestError("Rental date is required");
+    }
+
+    if (!maxReturnDate) {
+        throw new BadRequestError("Return date is required");
     }
 
     const t = await sequelize.transaction();
@@ -59,6 +63,7 @@ const createRental = async (req) => {
             {
                 userId,
                 rentalDate,
+                maxReturnDate,
                 returnDate: null, // Will be set when the rental is returned
                 isReturned: false,
                 amount,

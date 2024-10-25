@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getRentals } from "../services/api";
+import { getSuperAdminRentals } from "../services/api";
 
-const RentalHistory = () => {
+const Booking = () => {
   const [rentals, setRentals] = useState([]);
 
   useEffect(() => {
     const fetchRentals = async () => {
       try {
-        const response = await getRentals();
+        const response = await getSuperAdminRentals();
         setRentals(response.data.data);
         console.log(response.data.data);
       } catch (error) {
         console.error("Error fetching rentals:", error);
       }
     };
+
     fetchRentals();
   }, []);
 
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
+    <section className="ml-64 p-8 z-40 bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
         <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -60,16 +61,28 @@ const RentalHistory = () => {
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">
-                    Rental ID
+                    Booking ID
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Customer Name
                   </th>
                   <th scope="col" className="px-4 py-3">
                     Start Date
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Return Date
+                    Max Return Date
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Price
+                    End Date
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Amount
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Returned
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Penalty
                   </th>
                   <th scope="col" className="px-4 py-3">
                     <span className="sr-only">Actions</span>
@@ -85,20 +98,36 @@ const RentalHistory = () => {
                     >
                       {rental.id}
                     </th>
+                    <td className="px-4 py-3">{rental.User.fullName}</td>
                     <td className="px-4 py-3">
-                      {new Date(rental.rentalDate).toLocaleDateString()}
+                      {new Date(rental.rentalDate).toLocaleDateString("en-GB")}
                     </td>
                     <td className="px-4 py-3">
-                      {rental.maxReturnDate
-                        ? new Date(rental.maxReturnDate).toLocaleDateString()
-                        : "Null"}
+                      {new Date(rental.maxReturnDate).toLocaleDateString(
+                        "en-GB"
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {rental.returnDate
+                        ? new Date(rental.returnDate).toLocaleDateString(
+                            "en-GB"
+                          )
+                        : "-"}
                     </td>
                     <td className="px-4 py-3 text-lg font-bold text-blue-600">
                       ${rental.amount}
                     </td>
+                    <td className="px-4 py-3">
+                      {rental.isReturned ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-3 text-lg font-bold text-blue-600">
+                      {rental.Penalties.length > 0
+                        ? `$${rental.Penalties[0].amount}`
+                        : "-"}
+                    </td>
                     <td className="px-4 py-3 flex items-center justify-end">
                       <Link
-                        to={`/rental/${rental.id}`}
+                        to={`/booking/${rental.id}`}
                         className="text-blue-600 hover:underline"
                       >
                         View
@@ -215,4 +244,4 @@ const RentalHistory = () => {
   );
 };
 
-export default RentalHistory;
+export default Booking;

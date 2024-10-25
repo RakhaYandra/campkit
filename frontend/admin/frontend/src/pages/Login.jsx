@@ -30,9 +30,9 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await login(formData.email, formData.password);
-      if (response.data && response.data.user) {
-        const { email, fullName } = response.data.user;
-        console.log("Admin Logged In:", email, fullName);
+      if (response.data && response.data.superAdmin) {
+        const { email, fullName } = response.data.superAdmin;
+        console.log("Super Admin Logged In:", email, fullName);
         navigate("/");
         setCookie(response.data.token);
       } else {

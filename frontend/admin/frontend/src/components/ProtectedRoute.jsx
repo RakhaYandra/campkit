@@ -1,23 +1,10 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
-const ProtectedRoute = ({ element: Element, ...rest }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = () => {
+  const { user } = useAuth()
+  
+  return user ? <Outlet /> : <Navigate to="/login" />
+}
 
-  return (
-    <Route
-      {...rest}
-      element={
-        isAuthenticated ? <Element {...rest} /> : <Navigate to="/auth/login" />
-      }
-    />
-  );
-};
-
-ProtectedRoute.propTypes = {
-  element: PropTypes.elementType.isRequired,
-};
-
-export default ProtectedRoute;
+export default ProtectedRoute

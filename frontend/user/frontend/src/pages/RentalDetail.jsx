@@ -33,7 +33,7 @@ const RentalDetail = () => {
             <p className="text-gray-600">
               {new Date(rental.rentalDate).toLocaleDateString()} -
               {rental.returnDate
-                ? new Date(rental.returnDate).toLocaleDateString()
+                ? new Date(rental.maxReturnDate).toLocaleDateString()
                 : "Ongoing"}
             </p>
           </div>

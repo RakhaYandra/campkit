@@ -1,25 +1,54 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { getRentals } from "../services/api";
+import { Link, useNavigate } from "react-router-dom";
+import { getUnits, deleteUnit } from "../services/api"; // Import deleteUnit
 
-const RentalHistory = () => {
-  const [rentals, setRentals] = useState([]);
+const Units = () => {
+  const [units, setUnits] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchRentals = async () => {
+    const fetchUnits = async () => {
       try {
-        const response = await getRentals();
-        setRentals(response.data.data);
+        const response = await getUnits();
+        setUnits(response.data.data);
         console.log(response.data.data);
       } catch (error) {
-        console.error("Error fetching rentals:", error);
+        console.error("Error fetching units:", error);
       }
     };
-    fetchRentals();
+
+    fetchUnits();
   }, []);
 
+  const openModal = (id) => {
+    setUnitToDelete(id);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setUnitToDelete(null);
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteUnit(unitToDelete);
+      setUnits(units.filter((unit) => unit.id !== unitToDelete));
+      console.log(`Deleted unit with ID: ${unitToDelete}`);
+      closeModal();
+    } catch (error) {
+      console.error("Error deleting unit:", error);
+    }
+  };
+
+  const handleCreateUnit = () => {
+    navigate("/units/create");
+  };
+
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
+    <section className="ml-64 p-8 z-40 bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
         <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -54,22 +83,33 @@ const RentalHistory = () => {
                 </div>
               </form>
             </div>
+            <div className="w-full md:w-1/2 flex justify-end">
+              <button
+                onClick={() => navigate("/units/create")}
+                className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
+              >
+                Create Unit
+              </button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th scope="col" className="px-4 py-3">
-                    Rental ID
+                    ID
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Start Date
+                    Name
                   </th>
                   <th scope="col" className="px-4 py-3">
-                    Return Date
+                    Code
                   </th>
                   <th scope="col" className="px-4 py-3">
                     Price
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Category
                   </th>
                   <th scope="col" className="px-4 py-3">
                     <span className="sr-only">Actions</span>
@@ -77,32 +117,42 @@ const RentalHistory = () => {
                 </tr>
               </thead>
               <tbody>
-                {rentals.map((rental, i) => (
+                {units.map((unit, i) => (
                   <tr key={i} className="border-b dark:border-gray-700">
                     <th
                       scope="row"
                       className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                     >
-                      {rental.id}
+                      {unit.id}
                     </th>
-                    <td className="px-4 py-3">
-                      {new Date(rental.rentalDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      {rental.maxReturnDate
-                        ? new Date(rental.maxReturnDate).toLocaleDateString()
-                        : "Null"}
-                    </td>
+                    <td className="px-4 py-3">{unit.name}</td>
+                    <td className="px-4 py-3">{unit.code}</td>
                     <td className="px-4 py-3 text-lg font-bold text-blue-600">
-                      ${rental.amount}
+                      ${unit.price}
                     </td>
-                    <td className="px-4 py-3 flex items-center justify-end">
+                    <td className="px-4 py-3">
+                      {unit.Categories.map((category, index) => (
+                        <span
+                          key={index}
+                          className="bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-blue-200 dark:text-blue-800"
+                        >
+                          {category.name}
+                        </span>
+                      ))}
+                    </td>
+                    <td className="px-4 py-3 flex items-center justify-end space-x-2">
                       <Link
-                        to={`/rental/${rental.id}`}
+                        to={`/units/detail/${unit.id}`}
                         className="text-blue-600 hover:underline"
                       >
                         View
                       </Link>
+                      <button
+                        onClick={() => openModal(unit.id)}
+                        className="text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -202,7 +252,6 @@ const RentalHistory = () => {
                     <path
                       fillRule="evenodd"
                       d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
                     />
                   </svg>
                 </a>
@@ -211,8 +260,31 @@ const RentalHistory = () => {
           </nav>
         </div>
       </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[99] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
+            <p>Are you sure you want to delete this unit?</p>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
 
-export default RentalHistory;
+export default Units;

@@ -45,8 +45,7 @@ const updateRentalStatus = async (req) => {
         // Check if the returnDate exceeds 5 days from the rentalDate
         const rentalDate = new Date(rental.rentalDate);
         const returnDate = new Date(rental.returnDate);
-        const maxReturnDate = new Date(rentalDate);
-        maxReturnDate.setDate(maxReturnDate.getDate() + 5);
+        const maxReturnDate = new Date(rental.maxReturnDate);
 
         if (returnDate > maxReturnDate) {
             // Apply penalty

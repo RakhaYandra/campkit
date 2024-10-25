@@ -1,31 +1,15 @@
-import React from "react";
-import PropTypes from "prop-types";
-import Navbar from "./Navbar";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
-const Layout = ({ children }) => {
-  const layoutStyle = {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-  };
-
-  const mainStyle = {
-    flex: "1",
-    padding: "20px",
-  };
-
+const Layout = () => {
   return (
-    <div style={layoutStyle}>
-      <Navbar />
-      <main style={mainStyle} role="main">
-        {children}
+    <div>
+      <Sidebar />
+      <main className="container mx-auto px-4 py-8">
+        <Outlet />
       </main>
     </div>
   );
-};
-
-Layout.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default Layout;

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getUnits } from "../services/api"; // Removed bookRental import
-import Cookies from "js-cookie";
+import { getUnits } from "../services/api";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -9,7 +8,7 @@ const Products = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [rentalDate, setRentalDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
+  const [maxReturnDate, setMaxReturnDate] = useState("");
 
   // Search handler
   const handleSearchChange = (event) => {
@@ -20,6 +19,10 @@ const Products = () => {
   const handleSortToggle = () => {
     setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   };
+
+  useEffect(() => {
+    console.log("Rental Date : ", rentalDate, "Return Date : ", maxReturnDate);
+  }, [rentalDate, maxReturnDate]);
 
   // Product selection handler
   const handleProductSelect = (product) => {
@@ -37,12 +40,21 @@ const Products = () => {
 
   // Booking handler
   const handleBooking = async () => {
-    if (!rentalDate || !returnDate) {
+    if (!rentalDate || !maxReturnDate) {
       alert("Please select rental and return dates.");
       return;
     }
 
-    const token = Cookies.get("jwtToken"); // Replace with actual token
+    const rentalStartDate = new Date(rentalDate);
+    const rentalEndDate = new Date(maxReturnDate);
+    const rentalPeriod = (rentalEndDate - rentalStartDate) / (1000 * 60 * 60 * 24);
+
+    if (rentalPeriod > 5) {
+      alert("The rental period cannot exceed 5 days.");
+      return;
+    }
+
+    const token = localStorage.getItem("jwtToken"); // Replace with actual token
 
     try {
       const response = await fetch("http://localhost:9000/api/user/rental", {
@@ -54,7 +66,7 @@ const Products = () => {
         body: JSON.stringify({
           units: selectedProducts.map((product) => product.id),
           rentalDate,
-          returnDate,
+          maxReturnDate,
         }),
       });
 
@@ -66,7 +78,7 @@ const Products = () => {
       console.log("Booking successful:", responseData);
       setSelectedProducts([]); // Clear selected products after booking
       setRentalDate(""); // Clear rental date
-      setReturnDate(""); // Clear return date
+      setMaxReturnDate(""); // Clear return date
     } catch (error) {
       console.error("Error booking products:", error);
     }
@@ -230,8 +242,8 @@ const Products = () => {
         <input
           type="date"
           className="block w-full p-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-          value={returnDate}
-          onChange={(e) => setReturnDate(e.target.value)}
+          value={maxReturnDate}
+          onChange={(e) => setMaxReturnDate(e.target.value)}
         />
       </div>
 

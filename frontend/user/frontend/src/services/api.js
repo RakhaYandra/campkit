@@ -8,7 +8,7 @@ const api = axios.create({ baseURL })
 
 // Add token to requests if available
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('jwtToken')
+  const token = localStorage.getItem('jwtToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

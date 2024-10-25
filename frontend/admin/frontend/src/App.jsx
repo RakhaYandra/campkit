@@ -1,33 +1,40 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import CreateCategory from "./pages/categories/CreateCategory";
-import EditCategory from "./pages/categories/EditCategory";
-import Units from "./pages/units/index";
-import CreateUnit from "./pages/units/CreateUnit";
-import EditUnit from "./pages/units/EditUnit";
-import Rentals from "./pages/rentals/index";
-import RentalDetail from "./pages/rentals/RentalDetail";
-import Dashboard from "./pages/Dashboard";
-import Layout from "./components/Layout";
 import { AuthProvider } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
+import Units from "./pages/Units";
+import Booking from "./pages/Booking";
+import BookingDetail from "./pages/BookingDetail";
+import Category from "./pages/Category";
+import CategoryForm from "./pages/CategoryForm";
+import UnitsForm from "./pages/UnitsForm";
+import UnitsDetail from "./pages/UnitsDetail";
+import CategoryDetail from "./pages/CategoryDetail";
 
-const App = () => {
+function App() {
   return (
     <AuthProvider>
-      <Layout>
+      <Router>
         <Routes>
-          <Route path="/categories/create" element={<CreateCategory />} />
-          <Route path="/categories/edit/:id" element={<EditCategory />} />
-          <Route path="/units" element={<Units />} />
-          <Route path="/units/create" element={<CreateUnit />} />
-          <Route path="/units/edit/:id" element={<EditUnit />} />
-          <Route path="/rentals" element={<Rentals />} />
-          <Route path="/rentals/:id" element={<RentalDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/units" element={<Units />} />
+            <Route path="/units/create" element={<UnitsForm />} />
+            <Route path="/units/detail/:id" element={<UnitsDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/category" element={<Category />} />
+            <Route path="/category/create" element={<CategoryForm />} />
+            <Route path="/category/detail/:id" element={<CategoryDetail />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/booking/:id" element={<BookingDetail />} />
+          </Route>
         </Routes>
-      </Layout>
+      </Router>
     </AuthProvider>
   );
-};
+}
 
 export default App;

@@ -23,6 +23,10 @@ module.exports = {
                 type: Sequelize.DATE,
                 allowNull: false,
             },
+            maxReturnDate: {
+                type: Sequelize.DATE,
+                allowNull: false,
+            },
             returnDate: {
                 type: Sequelize.DATE,
                 allowNull: true,
