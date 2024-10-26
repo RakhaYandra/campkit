@@ -4,13 +4,17 @@ import { getSuperAdminRentals } from "../services/api";
 
 const Booking = () => {
   const [rentals, setRentals] = useState([]);
+  const [filteredRentals, setFilteredRentals] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const rentalsPerPage = 5;
 
   useEffect(() => {
     const fetchRentals = async () => {
       try {
         const response = await getSuperAdminRentals();
         setRentals(response.data.data);
-        console.log(response.data.data);
+        setFilteredRentals(response.data.data); // Initialize filteredRentals with all rentals
       } catch (error) {
         console.error("Error fetching rentals:", error);
       }
@@ -18,6 +22,28 @@ const Booking = () => {
 
     fetchRentals();
   }, []);
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    const filtered = rentals.filter((rental) =>
+      rental.id.toString().includes(e.target.value)
+    );
+    setFilteredRentals(filtered);
+    setCurrentPage(1); // Reset to first page after search
+  };
+
+  const handleClickPage = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Pagination calculations
+  const indexOfLastRental = currentPage * rentalsPerPage;
+  const indexOfFirstRental = indexOfLastRental - rentalsPerPage;
+  const currentRentals = filteredRentals.slice(
+    indexOfFirstRental,
+    indexOfLastRental
+  );
+  const totalPages = Math.ceil(filteredRentals.length / rentalsPerPage);
 
   return (
     <section className="ml-64 p-8 z-40 bg-gray-50 dark:bg-gray-900">
@@ -27,7 +53,7 @@ const Booking = () => {
             <div className="w-full md:w-1/2">
               <form className="flex items-center">
                 <label htmlFor="simple-search" className="sr-only">
-                  Search
+                  Search by Booking ID
                 </label>
                 <div className="relative w-full">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -48,14 +74,16 @@ const Booking = () => {
                   <input
                     type="text"
                     id="simple-search"
+                    value={searchQuery}
+                    onChange={handleSearch}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    placeholder="Search"
-                    required=""
+                    placeholder="Search by Booking ID"
                   />
                 </div>
               </form>
             </div>
           </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -90,8 +118,8 @@ const Booking = () => {
                 </tr>
               </thead>
               <tbody>
-                {rentals.map((rental, i) => (
-                  <tr key={i} className="border-b dark:border-gray-700">
+                {currentRentals.map((rental) => (
+                  <tr key={rental.id} className="border-b dark:border-gray-700">
                     <th
                       scope="row"
                       className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"
@@ -138,104 +166,33 @@ const Booking = () => {
               </tbody>
             </table>
           </div>
+
           <nav
-            className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+            className="flex justify-between items-center p-4"
             aria-label="Table navigation"
           >
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              Showing
-              <span className="font-semibold text-gray-900 dark:text-white">
-                1-10
-              </span>
-              of
-              <span className="font-semibold text-gray-900 dark:text-white">
-                1000
-              </span>
+              Showing {indexOfFirstRental + 1}-
+              {indexOfLastRental > filteredRentals.length
+                ? filteredRentals.length
+                : indexOfLastRental}{" "}
+              of {filteredRentals.length}
             </span>
             <ul className="inline-flex items-stretch -space-x-px">
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  <span className="sr-only">Previous</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
+              {[...Array(totalPages).keys()].map((page) => (
+                <li key={page}>
+                  <button
+                    onClick={() => handleClickPage(page + 1)}
+                    className={`flex items-center justify-center text-sm py-2 px-3 leading-tight ${
+                      currentPage === page + 1
+                        ? "bg-primary-50 text-primary-600"
+                        : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    } border border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  1
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  2
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  aria-current="page"
-                  className="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                >
-                  3
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  ...
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  100
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  <span className="sr-only">Next</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </li>
+                    {page + 1}
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>

@@ -39,11 +39,19 @@ const BookingDetail = () => {
 
   return (
     <div className="ml-64 p-8 z-40 max-w-2xl mx-auto bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-4 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+      >
+        Back
+      </button>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Booking Details
       </h3>
       <form onSubmit={handleSubmit}>
         <div className="grid gap-4 mb-4 sm:grid-cols-2">
+          {/* Booking details fields */}
           <div>
             <label
               htmlFor="customerName"
@@ -84,7 +92,9 @@ const BookingDetail = () => {
             <input
               type="text"
               id="maxReturnDate"
-              value={new Date(booking.maxReturnDate).toLocaleDateString("en-GB")}
+              value={new Date(booking.maxReturnDate).toLocaleDateString(
+                "en-GB"
+              )}
               disabled
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />

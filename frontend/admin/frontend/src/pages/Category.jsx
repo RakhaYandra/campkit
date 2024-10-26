@@ -4,16 +4,22 @@ import { getCategories, deleteCategory } from "../services/api";
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const navigate = useNavigate();
+
+  // Number of categories to display per page
+  const itemsPerPage = 5;
 
   useEffect(() => {
     const fetchCategory = async () => {
       try {
         const response = await getCategories();
         setCategories(response.data.data);
-        console.log(response.data.data);
+        setFilteredCategories(response.data.data);
       } catch (error) {
         console.error("Error fetching category:", error);
       }
@@ -21,6 +27,13 @@ const Category = () => {
 
     fetchCategory();
   }, []);
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  const currentCategories = filteredCategories.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const openModal = (id) => {
     setCategoryToDelete(id);
@@ -35,16 +48,34 @@ const Category = () => {
   const handleDelete = async () => {
     try {
       await deleteCategory(categoryToDelete);
-      setCategories(categories.filter((categorie) => categorie.id !== categoryToDelete));
-      console.log(`Deleted unit with ID: ${categoryToDelete}`);
+      setCategories(
+        categories.filter((categorie) => categorie.id !== categoryToDelete)
+      );
+      setFilteredCategories(
+        filteredCategories.filter(
+          (categorie) => categorie.id !== categoryToDelete
+        )
+      );
       closeModal();
     } catch (error) {
       console.error("Error deleting category:", error);
     }
   };
 
-  const handleCreateCategory = () => {
-    navigate("/category/create");
+  const handleSearch = (e) => {
+    const searchValue = e.target.value.toLowerCase();
+    setSearchTerm(searchValue);
+    const filtered = categories.filter(
+      (category) =>
+        category.name.toLowerCase().includes(searchValue) ||
+        category.description.toLowerCase().includes(searchValue)
+    );
+    setFilteredCategories(filtered);
+    setCurrentPage(1); // Reset to the first page on new search
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
@@ -76,9 +107,10 @@ const Category = () => {
                   <input
                     type="text"
                     id="simple-search"
+                    value={searchTerm}
+                    onChange={handleSearch}
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                     placeholder="Search"
-                    required=""
                   />
                 </div>
               </form>
@@ -111,7 +143,7 @@ const Category = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((category, i) => (
+                {currentCategories.map((category, i) => (
                   <tr key={i} className="border-b dark:border-gray-700">
                     <th
                       scope="row"
@@ -141,122 +173,85 @@ const Category = () => {
             </table>
           </div>
           <nav
-            className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4"
+            className="flex justify-between items-center p-4"
             aria-label="Table navigation"
           >
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
               Showing
               <span className="font-semibold text-gray-900 dark:text-white">
-                1-10
-              </span>
+                {" "}
+                {itemsPerPage * (currentPage - 1) + 1}
+              </span>{" "}
+              to
+              <span className="font-semibold text-gray-900 dark:text-white">
+                {" "}
+                {Math.min(
+                  itemsPerPage * currentPage,
+                  filteredCategories.length
+                )}
+              </span>{" "}
               of
               <span className="font-semibold text-gray-900 dark:text-white">
-                1000
+                {" "}
+                {filteredCategories.length}
               </span>
             </span>
             <ul className="inline-flex items-stretch -space-x-px">
               <li>
-                <a
-                  href="#"
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
                   className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                 >
-                  <span className="sr-only">Previous</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
+                  Previous
+                </button>
+              </li>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <li key={index}>
+                  <button
+                    onClick={() => handlePageChange(index + 1)}
+                    className={`flex items-center justify-center text-sm py-2 px-3 leading-tight ${
+                      currentPage === index + 1
+                        ? "text-primary-600 bg-primary-50 border-primary-300 dark:bg-gray-700 dark:text-white"
+                        : "text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                    }`}
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </a>
-              </li>
+                    {index + 1}
+                  </button>
+                </li>
+              ))}
               <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  1
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  2
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  aria-current="page"
-                  className="flex items-center justify-center text-sm z-10 py-2 px-3 leading-tight text-primary-600 bg-primary-50 border border-primary-300 hover:bg-primary-100 hover:text-primary-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-                >
-                  3
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  ...
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-                >
-                  100
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
                   className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
                 >
-                  <span className="sr-only">Next</span>
-                  <svg
-                    className="w-5 h-5"
-                    aria-hidden="true"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                    />
-                  </svg>
-                </a>
+                  Next
+                </button>
               </li>
             </ul>
           </nav>
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[99] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Confirm Delete</h2>
-            <p>Are you sure you want to delete this unit?</p>
-            <div className="mt-6 flex justify-end space-x-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Delete Category</h3>
+            <p className="text-gray-600 mb-4">
+              Are you sure you want to delete this category?
+            </p>
+            <div className="flex justify-end space-x-4">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg"
+                className="px-4 py-2 text-gray-600 bg-gray-200 rounded hover:bg-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg"
+                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
               >
                 Delete
               </button>

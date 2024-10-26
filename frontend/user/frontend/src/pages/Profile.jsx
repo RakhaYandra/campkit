@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
 import { getProfile, updateProfile } from "../services/api";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaEdit,
+} from "react-icons/fa";
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -15,6 +22,7 @@ const Profile = () => {
       const response = await getProfile();
       setProfile(response.data);
       setFormData(response.data);
+      console.log ("Profile data: ", response.data);
     } catch (error) {
       console.error("Failed to load profile:", error);
     }
@@ -35,8 +43,10 @@ const Profile = () => {
   if (!profile) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center">Profile</h1>
+    <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="text-3xl font-semibold mb-8 text-center text-blue-600">
+        Profile
+      </h1>
       {isEditing ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -121,32 +131,51 @@ const Profile = () => {
           </div>
         </form>
       ) : (
-        <div className="flex flex-col items-center">
-          <img
-            src={
-              profile.data.image ||
-              "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
-            }
-            alt="Profile"
-            className="w-32 h-32 rounded-full mb-4 shadow-lg"
-          />
-          <p className="mb-4 text-lg font-medium">
-            Full Name: {profile.data.fullName}
-          </p>
-          <p className="mb-4 text-lg font-medium">
-            Email: {profile.data.email}
-          </p>
-          <p className="mb-4 text-lg font-medium">
-            Phone Number: {profile.data.phoneNumber}
-          </p>
-          <p className="mb-4 text-lg font-medium">
-            Address: {profile.data.address}
-          </p>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="relative">
+            <img
+              src={
+                profile.data.image &&
+                profile.data.image.startsWith("data:image")
+                  ? profile.data.image
+                  : "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"
+              }
+              alt="Profile"
+              className="w-32 h-32 rounded-full mb-4 shadow-lg transition-transform duration-200 transform hover:scale-105"
+            />
+          </div>
+          <div className="w-full bg-gray-50 p-4 rounded-lg shadow-md">
+            <div className="flex items-center mb-4">
+              <FaUser className="text-blue-500 mr-3" />
+              <p className="text-lg font-medium">
+                Full Name: {profile.data.fullName}
+              </p>
+            </div>
+            <hr />
+            <div className="flex items-center my-4">
+              <FaEnvelope className="text-blue-500 mr-3" />
+              <p className="text-lg font-medium">Email: {profile.data.email}</p>
+            </div>
+            <hr />
+            <div className="flex items-center my-4">
+              <FaPhone className="text-blue-500 mr-3" />
+              <p className="text-lg font-medium">
+                Phone: {profile.data.phoneNumber}
+              </p>
+            </div>
+            <hr />
+            <div className="flex items-center mt-4">
+              <FaMapMarkerAlt className="text-blue-500 mr-3" />
+              <p className="text-lg font-medium">
+                Address: {profile.data.address}
+              </p>
+            </div>
+          </div>
           <button
             onClick={() => setIsEditing(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300"
+            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition duration-300"
           >
-            Edit Profile
+            <FaEdit className="mr-2" /> Edit Profile
           </button>
         </div>
       )}
