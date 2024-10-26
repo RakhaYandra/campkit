@@ -20,6 +20,25 @@ User
 6. Mengedit Profil
 7. Melihat Profile
 
+# Setup Project
+## Backend
+$env:NODE_ENV="development"; npx sequelize-cli db:migrate
+$env:NODE_ENV="development"; npx sequelize-cli db:seed:all
+
+## Frontend
+### User
+npm install
+npm install @radix-ui/react-dropdown-menu @radix-ui/react-slot @radix-ui/react-toast @shadcn/ui @tanstack/react-query axios class-variance-authority clsx date-fns flowbite-react js-cookie lucide-react react react-dom react-icons react-router-dom tailwind-merge
+npm install @eslint/js @types/react @types/react-dom @vitejs/plugin-react autoprefixer eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh globals postcss tailwindcss vite --save-dev
+npm install -D tailwindcss postcss autoprefixer
+
+### Admin
+npm install
+npm install @radix-ui/react-dropdown-menu @radix-ui/react-slot @radix-ui/react-toast @shadcn/ui @tanstack/react-query axios class-variance-authority clsx date-fns flowbite-react js-cookie lucide-react react react-dom react-icons react-router-dom tailwind-merge
+npm install @eslint/js @types/react @types/react-dom @vitejs/plugin-react autoprefixer eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-refresh globals postcss tailwindcss vite --save-dev
+npm install -D tailwindcss postcss autoprefixer
+
+
 # Skema Database
 ![bnsp](https://github.com/user-attachments/assets/515f9a1d-5575-420b-8059-57061ba515d8)
 
