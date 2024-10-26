@@ -21,7 +21,22 @@ export const AuthProvider = ({ children }) => {
       );
       setUser(response.data.data);
       console.log("User Logged In:", response.data.data.token);
-    localStorage.setItem("jwtToken", response.data.data.token);
+      localStorage.setItem("jwtToken", response.data.data.token);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const register = async (formData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:9000/api/user/auth/register",
+        formData
+      );
+      setUser(response.data.data);
+      console.log("User Registered:", response.data.data.token);
+      localStorage.setItem("jwtToken", response.data.data.token);
       return response.data;
     } catch (error) {
       throw error;
@@ -37,6 +52,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     login,
+    register,
     logout,
   };
 

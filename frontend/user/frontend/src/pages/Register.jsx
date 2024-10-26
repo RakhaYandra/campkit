@@ -41,11 +41,13 @@ const Register = () => {
 
     if (!validateForm()) return;
 
+    console.log("Form Data: ", formData); // Tambahkan log ini
     setIsSubmitting(true);
     try {
       await register(formData);
       navigate("/login");
     } catch (error) {
+      console.error("Error during registration:", error); // Tambahkan log ini
       setError(
         error.response?.data?.msg || "Registration failed. Please try again."
       );
@@ -62,6 +64,8 @@ const Register = () => {
     }));
     setError(""); // Clear error when user starts typing
   };
+
+  console.log(formData);
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
